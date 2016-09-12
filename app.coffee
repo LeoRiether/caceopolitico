@@ -1,3 +1,10 @@
+ajax = (url, fn, respType) ->
+  req = new XMLHttpRequest()
+  req.open 'GET', url, yes
+  req.responseType = respType if respType?
+  req.onload = fn.bind null, req if fn?
+  do req.send
+
 class Politico
   constructor: (@name, @unblock, img, audio) ->
     @img = "img/#{img}.png"
@@ -10,6 +17,7 @@ class App
     do cacheDom
     do bindEvents
     do initAudio
+    do initImg
     do @makePolitico
 
   dom = {}
@@ -19,6 +27,12 @@ class App
       modal: document.querySelector('.modal'),
       repeatBtn: document.querySelector('.btn')
     };
+
+  bindEvents = ->
+    ael document, 'mousemove', throttle bodyMouseMove, 80
+    ael document, 'touchmove', throttle bodyTouchMove, 80
+    ael dom.body, 'click', bodyClick
+    ael dom.repeatBtn, 'click', repeatBtnClick
 
   hideModal: ->
     dom.modal.classList.add 'hidden'
@@ -38,39 +52,36 @@ class App
       setTimeout (-> t = no), d
       f arguments...
 
-  bindEvents = ->
-    ael document, 'mousemove', throttle bodyMouseMove, 80
-    ael dom.body, 'click', bodyClick
-    ael dom.repeatBtn, 'click', repeatBtnClick
-
   dist = (x0, y0, x1, y1) ->
     dx = x1 - x0
     dy = y1 - y0
     Math.sqrt dx*dx + dy*dy
 
-  mouseRange = { s: 80 }
+  mouseRange = [ 10, 50, 200, 400 ]
   mdist = -1
   cacando = yes
   bodyMouseMove = ({ clientX: x, clientY: y }) =>
     return if not cacando
     mdist = dist(x, y, politico.x, politico.y)
     clearInterval audioItv
-    if mdist < mouseRange.s
+    if mdist < mouseRange[0]
       audioItv = setInterval @self.playSound.bind(audio.beep), 150
       dom.body.style.background = '#21cc0e'
       dom.body.style.cursor = 'pointer'
     else
       audioItv = setInterval @self.playSound.bind(audio.beep), mdist*2
-      if mdist < mouseRange.s + 100
+      if mdist < mouseRange[1]
         dom.body.style.background = '#e4dd27'
-      else if mdist < mouseRange.s + 200
+      else if mdist < mouseRange[2]
         dom.body.style.background = '#f27215'
-      else if mdist < mouseRange.s + 300
+      else if mdist < mouseRange[3]
         dom.body.style.background = '#f75c19'
       else
         dom.body.style.background = '#ff4d00'
       dom.body.style.cursor = ''
 
+  bodyTouchMove = ({ touches: [ a ] }) =>
+    bodyMouseMove(a);
 
   bodyClick = =>
     return if not cacando
@@ -128,12 +139,11 @@ class App
   audioCtx = undefined
   audioSource = undefined
   ajaxAudio = (url, key) ->
-    req = new XMLHttpRequest()
-    req.open 'GET', url, yes
-    req.responseType = 'arraybuffer'
-    req.onload = ->
-      audioCtx.decodeAudioData req.response, ((buff) -> audio[key] = buff)
-    do req.send
+    ajax (
+      url
+      ((req) -> audioCtx.decodeAudioData req.response, ((buff) -> audio[key] = buff))
+      'arraybuffer'
+    )
 
   initAudio = ->
     try
@@ -149,6 +159,9 @@ class App
     audioSource.buffer = buff;
     audioSource.connect audioCtx.destination
     audioSource.start 0
+
+  initImg = ->
+    ajax pol.img for pol in politicos
 
 
 
