@@ -139,7 +139,7 @@
       if (!cacando) {
         return;
       }
-      if (mdist < mouseRange.s) {
+      if (mdist < mouseRange[0]) {
         dom.body.style.removeProperty('background');
         dom.body.style.removeProperty('cursor');
         App.self.makePoliticoImg();
