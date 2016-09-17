@@ -194,7 +194,7 @@
 
     countPoliticos = 0;
 
-    politicos = [new Politico('Temer', 0, 'Temer', 'beep'), new Politico('Dilma', 5, 'Dilma', 'beep'), new Politico('Cunha', 10, 'Cunha', 'beep')];
+    politicos = [new Politico('Temer', 0, 'temer', 'beep'), new Politico('Dilma', 5, 'Dilma', 'beep'), new Politico('Cunha', 10, 'Cunha', 'beep')];
 
     App.prototype.makePolitico = function() {
       var h, w;

@@ -123,7 +123,7 @@ class App
 
   countPoliticos = 0
   politicos = [
-    new Politico 'Temer', 0, 'Temer', 'beep'
+    new Politico 'Temer', 0, 'temer', 'beep'
     new Politico 'Dilma', 5, 'Dilma', 'beep'
     new Politico 'Cunha', 10, 'Cunha', 'beep'
   ]

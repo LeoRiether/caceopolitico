@@ -118,5 +118,17 @@ html, body {
     height: 6em;
     transform: translateY(-0.5em);
   }
+}
 
+
+
+.info {
+  display: block;
+  position: fixed;
+  background: url('img/information.png');
+  background-size: 0.8em 0.8em;
+  width: 0.8em;
+  height: 0.8em;
+  bottom: 1%;
+  right: 1%;
 }
