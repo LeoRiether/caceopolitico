@@ -12,16 +12,7 @@ class Politico
     @audioKey = audio
   blocked: yes
 
-class Game
-
-class Audio
-
-
-
-
 class App
-  politico = {}
-  politicoIdx = 0
   constructor: ->
     App.self = this
     do cacheDom
@@ -33,11 +24,10 @@ class App
   dom = {}
   cacheDom = ->
     dom.body = document.body
-    dom.modal = document.querySelector '.modal'
-    dom.repeatBtn = dom.modal.querySelector '.btn'
-    dom.startModal = document.querySelector '.start-modal'
-    dom.polListStart = dom.startModal.querySelectorAll '.pol-list li'
-    dom.startBtn = dom.startModal.querySelector '.btn'
+    dom.modal = document.querySelector('.modal')
+    dom.repeatBtn = dom.modal.querySelector('.btn')
+    dom.startModal = document.querySelector('.start-modal')
+    dom.startBtn = dom.startModal.querySelector('.btn')
 
   bindEvents = ->
     ael document, 'mousemove', throttle bodyMouseMove, 80
@@ -45,13 +35,6 @@ class App
     ael dom.body, 'click', bodyClick
     ael dom.repeatBtn, 'click', repeatBtnClick
     ael dom.startBtn, 'click', startBtnClick
-    dom.polListStart.forEach ((li) ->
-      ael li, 'click', ((e) ->
-        politicoIdx = parseInt e.target.dataset.pol
-        dom.startModal.querySelector('.active').classList.remove 'active'
-        li.classList.add 'active'
-      )
-    )
 
   hideModal: ->
     dom.modal.classList.add 'hidden'
@@ -77,15 +60,24 @@ class App
     Math.sqrt dx*dx + dy*dy
 
   #mouseRange = [ 10, 50, 200, 400 ]
-  mouseRange = [ 50, 300, 600, 1000 ]
+  mouseRange = [ 50, 100, 200, 400 ]
   mdist = mouseRange[1]
   cacando = no
   bodyMouseMove = ({ clientX: x, clientY: y }) =>
     return if not cacando
     mdist = dist(x, y, politico.x, politico.y)
     if mdist < mouseRange[0]
+      dom.body.style.background = '#21cc0e'
       dom.body.style.cursor = 'pointer'
     else
+      if mdist < mouseRange[1]
+        dom.body.style.background = '#e4dd27'
+      else if mdist < mouseRange[2]
+        dom.body.style.background = '#f27215'
+      else if mdist < mouseRange[3]
+        dom.body.style.background = '#f75c19'
+      else
+        dom.body.style.background = '#ff4d00'
       dom.body.style.cursor = ''
 
   bodyTouchMove = ({ touches: [ a ] }) =>
@@ -121,17 +113,17 @@ class App
   getHeight = ->
     Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
 
+  politico = {}
   countPoliticos = 0
   politicos = [
-    new Politico 'Temer', 0, 'Temer', 'beep'
-    new Politico 'Dilma', 5, 'Dilma', 'beep'
+    new Politico 'Temer', 0, 'Temer', 'beep',
+    new Politico 'Dilma', 5, 'Dilma', 'beep',
     new Politico 'Cunha', 10, 'Cunha', 'beep'
   ]
   makePolitico: ->
     w = do getWidth
     h = do getHeight
-    politico = politicos[politicoIdx]
-    console.log politicos
+    politico = politicos[0]
     politico.x = Math.floor Math.random() * (w-100) + 100
     politico.y = Math.floor Math.random() * (h-100) + 100
     console.info "#{politico.name} #{politico.x} #{politico.y} #{politico.img} #{politico.audio}"
@@ -169,15 +161,8 @@ class App
   setCanPlaySound = ->
     canPlaySound = yes
   playSound: ->
-    return if not canPlaySound or not cacando
-    if mdist < mouseRange[0]
-      setTimeout setCanPlaySound, 150
-    else if mdist < mouseRange[1]
-      setTimeout setCanPlaySound, 300
-    else if mdist < mouseRange[2]
-      setTimeout setCanPlaySound, 500
-    else
-      setTimeout setCanPlaySound, 800
+    return if not canPlaySound or cacando
+    setTimeout setCanPlaySound,
     canPlaySound = no
     audioSource = do audioCtx.createBufferSource
     audioSource.buffer = audio[politico.audioKey];

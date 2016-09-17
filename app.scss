@@ -1,4 +1,6 @@
-@import 'https://fonts.googleapis.com/css?family=Raleway';
+@import 'https://fonts.googleapis.com/css?family=Raleway:400,700';
+
+$col: #0689dd;
 
 html, body {
   display: flex;
@@ -7,15 +9,33 @@ html, body {
   height: 100%;
   padding: 0;
   margin: 0;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.modal {
-  font-family: "Raleway", Arial, sans-serif;
+.start-modal {
+  animation: zoomStartModal 1s;
+}
+
+@keyframes zoomStartModal {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%);
+  }
+}
+
+.modal, .start-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 2em 4em;
+  padding: 1em 4em 2em 4em;
   background: #fdfdfd;
   border-radius: 0.5em;
   border: thin solid rgba(#797979, 0.4);
@@ -32,18 +52,28 @@ html, body {
   visibility: collapse;
 }
 
+.title {
+  font-family: "Raleway", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 3em;
+  text-align: center;
+  margin-top: 0;
+}
+
 .btn {
   cursor: pointer;
-  $col: rgba(#636363, .7);
-  background: linear-gradient(to bottom, $col, darken($col, 4%) 130%);
+  background: none;
+  outline: none;
+  border: none;
   padding: 0.25em 0.5em;
   font-family: "Raleway", Arial, sans-serif;
-  color: white;
-  border-radius: 0.4em;
-  border: thin solid darken($col, 10%);
+  font-size: 1em;
+  width: 100%;
+  text-align: center;
+  color: #3d3d3d;
   transition: all 0.2s;
   &:hover {
-    background: linear-gradient(to bottom, $col, darken($col, 10%) 130%);
+    color: black;
   }
 }
 
@@ -67,4 +97,26 @@ html, body {
   to {
     height: 200px;
   }
+}
+.pol-list {
+  display: flex;
+  width: 100%;
+  margin: 1em 0;
+  padding: 0;
+  justify-content: space-around;
+  list-style: none;
+
+  img {
+    height: 5em;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  li { cursor: pointer; }
+
+  .active img {
+    height: 6em;
+    transform: translateY(-0.5em);
+  }
+
 }
