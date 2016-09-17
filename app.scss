@@ -123,12 +123,14 @@ html, body {
 
 
 .info {
+  cursor: pointer;
+  $s: 1.5em;
   display: block;
   position: fixed;
   background: url('img/information.png');
-  background-size: 0.8em 0.8em;
-  width: 0.8em;
-  height: 0.8em;
+  background-size: $s $s;
+  width: $s;
+  height: $s;
   bottom: 1%;
   right: 1%;
 }

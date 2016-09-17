@@ -77,7 +77,7 @@ class App
     Math.sqrt dx*dx + dy*dy
 
   #mouseRange = [ 10, 50, 200, 400 ]
-  mouseRange = [ 50, 300, 600, 1000 ]
+  mouseRange = [ 100, 500, 1000, 2000 ]
   mdist = mouseRange[1]
   cacando = no
   bodyMouseMove = ({ clientX: x, clientY: y }) =>

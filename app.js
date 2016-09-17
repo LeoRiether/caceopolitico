@@ -122,7 +122,7 @@
       return Math.sqrt(dx * dx + dy * dy);
     };
 
-    mouseRange = [50, 300, 600, 1000];
+    mouseRange = [100, 500, 1000, 2000];
 
     mdist = mouseRange[1];
 
