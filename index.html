@@ -1,30 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Cace o Político</title>
-  <link rel="stylesheet" href="app.min.css">
-</head>
-<body>
-
-  <div class="start-modal">
-    <h1 class="title">Escolha o Político</h1>
-    <ul class="pol-list">
-      <li class="active"><img src="img/temer.png" alt="Temer" data-pol="0"></li>
-      <li><img src="img/Dilma.png" alt="Dilminha" data-pol="1"></li>
-      <li><img src="img/Cunha.png" alt="Cunha" data-pol="2"></li>
-    </ul>
-    <button class="btn">Start</button>
-  </div>
-  <div class="modal hidden">
-    <h1 class="title">Você ganhou!</h1>
-    <button class="btn">Cassar outro político</button>
-  </div>
-  <span class="info"></span>
-
-  <script src="app.js"></script>
-
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cace o Político</title>
+    <link rel="stylesheet" href="css/app.min.css">
+  </head>
+  <body>
+    <div class="hint"></div>
+    <div class="start-modal">
+      <h1 class="title center">Escolha o Político</h1>
+      <ul class="pol-list">
+        <li class="active"><img src="img/temer.png" alt="Temer" data-pol="0"></li>
+        <li><img src="img/Dilma.png" alt="Dilminha" data-pol="1"></li>
+        <li><img src="img/Cunha.png" alt="Cunha" data-pol="2"></li>
+      </ul>
+      <button class="btn">Start</button>
+    </div>
+    <div class="modal hidden">
+      <div class="left">
+        <h1 class="title">Político Cassado!</h1>
+        <p>Total de pontos: <span class="pontos"></span></p>
+        <div class="button-group">
+          <button class="btn btn-left">Casse de Novo!</button>
+          <button class="btn btn-left">Casse outro político!</button>
+        </div>
+      </div><img src="" class="polImgModal">
+    </div><span class="ion-ios-information-outline info-btn"></span>
+    <div class="window info-window hidden"><span class="close">×</span>
+      <h1 class="title light"><span class="ion-ios-information-outline"></span> Informações</h1>
+      <p>Ó lá!</p>
+      <p>Esse é um site apartidário que não possui objetivo nenhum de promover ou depreciar qualquer partido político</p>
+      <p class="border-bottom">Observação: estamos apenas na versão alpha(α) do jogo Casse o Político™. Por favor doe dinheiro</p>
+      <p class="border-bottom">Você já jogou: 1000000h</p>
+      <p>Alguma sugestão? Faltou algum político? Entre em contato em: <a href="mailto:casseopolitico@gmail.com">casseopolítico@gmail.com</a></p>
+    </div>
+    <script src="coffee/app.js"></script>
+  </body>
 </html>

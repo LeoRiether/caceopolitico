@@ -22,6 +22,7 @@ class Audio
 class App
   politico = {}
   politicoIdx = 0
+  cacando = no
   constructor: ->
     App.self = this
     do cacheDom
@@ -35,9 +36,13 @@ class App
     dom.body = document.body
     dom.modal = document.querySelector '.modal'
     dom.repeatBtn = dom.modal.querySelector '.btn'
+    dom.polImgModal = dom.modal.querySelector '.polImgModal'
     dom.startModal = document.querySelector '.start-modal'
     dom.polListStart = dom.startModal.querySelectorAll '.pol-list li'
     dom.startBtn = dom.startModal.querySelector '.btn'
+    dom.infoBtn = document.querySelector '.info-btn'
+    dom.infoWindow = document.querySelector '.info-window'
+    dom.closeInfo = dom.infoWindow.querySelector '.close'
 
   bindEvents = ->
     ael document, 'mousemove', throttle bodyMouseMove, 80
@@ -52,6 +57,9 @@ class App
         li.classList.add 'active'
       )
     )
+    paused = no
+    ael dom.infoBtn, 'click', (-> dom.infoWindow.classList.toggle 'hidden'; cacando = [paused, paused = cacando][0])
+    ael dom.closeInfo, 'click', (-> dom.infoWindow.classList.add 'hidden'; cacando = [paused, paused = cacando][0])
 
   hideModal: ->
     dom.modal.classList.add 'hidden'
@@ -79,7 +87,6 @@ class App
   #mouseRange = [ 10, 50, 200, 400 ]
   mouseRange = [ 100, 500, 1000, 2000 ]
   mdist = mouseRange[1]
-  cacando = no
   bodyMouseMove = ({ clientX: x, clientY: y }) =>
     return if not cacando
     mdist = dist(x, y, politico.x, politico.y)
@@ -91,6 +98,10 @@ class App
   bodyTouchMove = ({ touches: [ a ] }) =>
     bodyMouseMove(a);
 
+  triggerAfterModalAnim = =>
+    do @self.showModal
+    do @self.removePoliticoImg
+
   bodyClick = =>
     return if not cacando
     if mdist < mouseRange[0]
@@ -98,7 +109,7 @@ class App
       dom.body.style.removeProperty 'cursor'
       do @self.makePoliticoImg
       countPoliticos++
-      setTimeout @self.showModal, 1000
+      setTimeout triggerAfterModalAnim, 1000
       cacando = no
       mdist = mouseRange.s+1
 
@@ -134,6 +145,10 @@ class App
     console.log politicos
     politico.x = Math.floor Math.random() * (w-100) + 100
     politico.y = Math.floor Math.random() * (h-100) + 100
+    a = document.querySelector('.hint')
+    console.log a
+    a.style.top = politico.y + 'px'
+    a.style.left = politico.x + 'px'
     console.info "#{politico.name} #{politico.x} #{politico.y} #{politico.img} #{politico.audio}"
 
   makePoliticoImg: ->
@@ -143,6 +158,7 @@ class App
     img.style.left = "#{politico.x}px"
     img.style.top = "#{politico.y}px"
     dom.body.appendChild img
+    dom.polImgModal.setAttribute 'src', politico.img
 
   removePoliticoImg: ->
     polImg = document.querySelector('.polImg')

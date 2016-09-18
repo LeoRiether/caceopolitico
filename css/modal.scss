@@ -1,0 +1,32 @@
+.start-modal {
+  animation: zoomStartModal 1s;
+}
+
+.modal {
+  display: flex;
+}
+
+.modal, .start-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1em 4em 2em 4em;
+  background: #fdfdfd;
+  border-radius: 0.5em;
+  border: thin solid rgba(#797979, 0.4);
+  box-shadow: -.2em .2em .4em rgba(#797979, .4);
+  transition: all .8s;
+  visibility: visible;
+  &.hidden {
+    transform: translate(-50%, 0);
+    top: 100%;
+  }
+  .left {
+    flex: 1;
+    margin-right: 2em;
+  }
+  .polImgModal {
+    height: 12em;
+  }
+}
