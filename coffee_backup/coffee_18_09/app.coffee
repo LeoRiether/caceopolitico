@@ -1,51 +1,3 @@
-class Audio
-  audio = {}
-  getAudio: -> audio
-  audioItv = undefined
-  audioCtx = undefined
-  getAudioCtx: -> audioCtx
-  audioSource = undefined
-
-  ajaxAudio: (url, key) =>
-    ajax url, ((req) => audioCtx.decodeAudioData req.response, ((buff) => audio[key] = buff)), 'arraybuffer'
-
-  constructor: ->
-    try
-      window.AudioContext = window.AudioContext||window.webkitAudioContext;
-      audioCtx = new window.AudioContext();
-      #ajaxAudio 'audio/Cunha/Cunha001.wav', 'beep'
-      audioItv = setInterval @playSound, 100
-    catch
-      alert('Web Audio API não é suportado em seu browser');
-
-  canPlaySound = yes
-  setCanPlaySound = ->
-    canPlaySound = yes
-  playSound: ->
-    return if not canPlaySound or not game.cacando
-    console.log game.politico.audio[0], audio[game.politico.audio[0]]
-    audioSource = do audioCtx.createBufferSource
-    if game.mdist < game.mouseRange[0]
-      audioSource.buffer = audio[game.politico.audio[3]]
-      setTimeout setCanPlaySound, 200
-    else if game.mdist < game.mouseRange[1]
-      audioSource.buffer = audio[game.politico.audio[2]]
-      setTimeout setCanPlaySound, 250
-    else if game.mdist < game.mouseRange[2]
-      audioSource.buffer = audio[game.politico.audio[1]]
-      setTimeout setCanPlaySound, 350
-    else
-      audioSource.buffer = audio[game.politico.audio[0]]
-      setTimeout setCanPlaySound, 500
-    canPlaySound = no
-    #audioSource.buffer = audio[game.politico.audioKey];
-    audioSource.connect audioCtx.destination
-    audioSource.start 0
-
-audio = new Audio()
-
-
-
 ajax = (url, fn, respType) ->
   req = new XMLHttpRequest()
   req.open 'GET', url, yes
@@ -54,15 +6,10 @@ ajax = (url, fn, respType) ->
   do req.send
 
 class Politico
-  constructor: (@name, @unblock, img, @audioKey) ->
+  constructor: (@name, @unblock, img, audio) ->
     @img = "img/#{img}.png"
-    #@audio = ("audio/#{audioKey}/#{audioKey}00#{i}.wav" for i in [1..4])
-    @audio = (for i in [1..4]
-      k = "#{@audioKey}00#{i}"
-      l = "audio/#{@audioKey}/#{k}.wav"
-      audio.ajaxAudio l, k
-      k
-    )
+    @audio = "audio/#{audio}.mp3"
+    @audioKey = audio
   blocked: yes
 
 class Storage
@@ -79,43 +26,6 @@ class Storage
 
 storage = new Storage()
 
-class Modal
-  triggerAfterAnim: =>
-    do @setPontos
-    do @show
-    do game.removePoliticoImg
-
-  hide: ->
-    dom.modal.classList.add 'hidden'
-  show: ->
-    dom.modal.classList.remove 'hidden'
-  toggle: ->
-    dom.modal.classList.toggle 'hidden'
-
-  startHide: ->
-    dom.startModal.classList.add 'hidden'
-  startShow: ->
-    dom.startModal.classList.remove 'hidden'
-  startToggle: ->
-    dom.startModal.classList.toggle 'hidden'
-
-  setPontos: ->
-    dom.modalPontos.innerHTML = storage.pontos
-
-  startBtnClick: =>
-    game.cacando = yes
-    @startHide()
-    do game.makePolitico
-
-  repeatBtnClick: ->
-    return if game.cacando
-    setTimeout (-> game.cacando = yes), 800
-    do game.removePoliticoImg
-    do game.makePolitico
-    do modal.hide
-
-modal = new Modal()
-
 class Game
   mouseRange: [ 100, 500, 1000, 2000 ]
   mdist: Game::mouseRange[1]
@@ -123,9 +33,9 @@ class Game
   politicoIdx: 0
   cacando: no
   politicos = [
-    new Politico 'Temer', 0, 'temer', 'Temer'
-    new Politico 'Dilma', 5, 'Dilma', 'Dilma'
-    new Politico 'Cunha', 10, 'Cunha', 'Cunha'
+    new Politico 'Temer', 0, 'temer', 'beep'
+    new Politico 'Dilma', 5, 'Dilma', 'beep'
+    new Politico 'Cunha', 10, 'Cunha', 'beep'
   ]
   bodyMouseMove: ({ clientX: x, clientY: y }) =>
     return if not @cacando
@@ -143,6 +53,11 @@ class Game
     dy = y1 - y0
     Math.sqrt dx*dx + dy*dy
 
+  triggerAfterModalAnim: =>
+    do dom.setModalPontos
+    do dom.showModal
+    do @removePoliticoImg
+
   bodyClick: =>
     return if not @cacando
     if @mdist < @mouseRange[0]
@@ -150,13 +65,31 @@ class Game
       dom.body.style.removeProperty 'cursor'
       do @makePoliticoImg
       storage.addPontos()
-      setTimeout modal.triggerAfterAnim, 1000
+      setTimeout @triggerAfterModalAnim, 1000
       @cacando = no
       @mdist = @mouseRange[0]+1
 
+  startBtnClick: =>
+    @cacando = yes
+    dom.startModal.classList.add 'hidden'
+    #setTimeout (-> dom.startModal.remove()), 800
+    do @makePolitico
+
+  repeatBtnClick: =>
+    return if @cacando
+    setTimeout (=> @cacando = yes), 800
+    do @removePoliticoImg
+    do @makePolitico
+    do dom.hideModal
+
+  getWidth = ->
+    Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+  getHeight = ->
+    Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+
   makePolitico: ->
-    w = do dom.getWidth
-    h = do dom.getHeight
+    w = do getWidth
+    h = do getHeight
     @politico = politicos[@politicoIdx]
     @politico.x = Math.floor Math.random() * (w-100) + 100
     @politico.y = Math.floor Math.random() * (h-100) + 100
@@ -178,6 +111,46 @@ class Game
     do polImg.remove if polImg
 
 game = new Game()
+
+class Audio
+  audio = {}
+  getAudio: -> audio
+  audioItv = undefined
+  audioCtx = undefined
+  getAudioCtx: -> audioCtx
+  audioSource = undefined
+  ajaxAudio = (url, key) ->
+    ajax url, ((req) -> audioCtx.decodeAudioData req.response, ((buff) -> audio[key] = buff)), 'arraybuffer'
+
+  constructor: ->
+    try
+      window.AudioContext = window.AudioContext||window.webkitAudioContext;
+      audioCtx = new window.AudioContext();
+      ajaxAudio 'audio/beep.mp3', 'beep'
+      audioItv = setInterval @playSound, 100
+    catch
+      alert('Web Audio API não é suportado em seu browser');
+
+  canPlaySound = yes
+  setCanPlaySound = ->
+    canPlaySound = yes
+  playSound: ->
+    return if not canPlaySound or not game.cacando
+    if game.mdist < game.mouseRange[0]
+      setTimeout setCanPlaySound, 150
+    else if game.mdist < game.mouseRange[1]
+      setTimeout setCanPlaySound, 300
+    else if game.mdist < game.mouseRange[2]
+      setTimeout setCanPlaySound, 500
+    else
+      setTimeout setCanPlaySound, 800
+    canPlaySound = no
+    audioSource = do audioCtx.createBufferSource
+    audioSource.buffer = audio[game.politico.audioKey];
+    audioSource.connect audioCtx.destination
+    audioSource.start 0
+
+audio = new Audio()
 
 class Dom
   constructor: ->
@@ -210,8 +183,8 @@ class Dom
     ael document, 'mousemove', throttle game.bodyMouseMove, 80
     ael document, 'touchmove', throttle game.bodyTouchMove, 80
     ael @body, 'click', game.bodyClick
-    ael @repeatBtn, 'click', modal.repeatBtnClick
-    ael @startBtn, 'click', modal.startBtnClick
+    ael @repeatBtn, 'click', game.repeatBtnClick
+    ael @startBtn, 'click', game.startBtnClick
     @polListStart.forEach ((li) =>
       ael li, 'click', ((e) =>
         game.politicoIdx = parseInt e.target.dataset.pol
@@ -223,10 +196,15 @@ class Dom
     ael @infoBtn, 'click', (=> @infoWindow.classList.toggle 'hidden'; game.cacando = [paused, paused = game.cacando][0])
     ael @closeInfo, 'click', (=> @infoWindow.classList.add 'hidden'; game.cacando = [paused, paused = game.cacando][0])
 
-  getWidth: ->
-    Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-  getHeight: ->
-    Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+  hideModal: ->
+    dom.modal.classList.add 'hidden'
+  showModal: ->
+    dom.modal.classList.remove 'hidden'
+  toggleModal: ->
+    dom.modal.classList.toggle 'hidden'
+
+  setModalPontos: ->
+    dom.modalPontos.innerHTML = storage.pontos
 
 dom = new Dom()
 
