@@ -1,5 +1,7 @@
 class Game
-  mouseRange: [ 100, 500, 1000, 2000 ]
+  #mouseRange: [ 100, 500, 1000, 2000 ]
+  screenWidth = Math.max(Math.max(document.documentElement.clientWidth, window.innerWidth || 0), Math.max(document.documentElement.clientHeight, window.innerWidth || 0))
+  mouseRange: [ 0.0528033, 0.26, 0.520833, 0.7 ].map (e) -> e*screenWidth
   mdist: Game::mouseRange[1]
   politico: {}
   politicoIdx: 0
@@ -34,14 +36,14 @@ class Game
       storage.addPontos()
       setTimeout modal.triggerAfterAnim, 1000
       @cacando = no
-      @mdist = @mouseRange[0]+1
+      @mdist = @mouseRange[1]
 
   makePolitico: ->
     w = do dom.getWidth
     h = do dom.getHeight
     @politico = politicos[@politicoIdx]
-    @politico.x = Math.floor Math.random() * (w-100) + 100
-    @politico.y = Math.floor Math.random() * (h-100) + 100
+    @politico.x = Math.floor Math.random() * (w-0.05*w) + 0.025*w
+    @politico.y = Math.floor Math.random() * (h-0.05*h) + 0.025*h
     a = document.querySelector('.hint')
     a.style.top = @politico.y + 'px'
     a.style.left = @politico.x + 'px'

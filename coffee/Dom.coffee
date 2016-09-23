@@ -3,7 +3,8 @@ class Dom
     @body = document.body
     @modal = document.querySelector '.modal'
     @modalPontos = @modal.querySelector '.pontos'
-    @repeatBtn = @modal.querySelector '.btn'
+    @repeatBtn = @modal.querySelector '.repeat'
+    @switchBtn = @modal.querySelector '.switch'
     @polImgModal = @modal.querySelector '.polImgModal'
     @startModal = document.querySelector '.start-modal'
     @polListStart = @startModal.querySelectorAll '.pol-list li'
@@ -30,6 +31,7 @@ class Dom
     ael document, 'touchmove', throttle game.bodyTouchMove, 80
     ael @body, 'click', game.bodyClick
     ael @repeatBtn, 'click', modal.repeatBtnClick
+    ael @switchBtn, 'click', modal.switchBtnClick
     ael @startBtn, 'click', modal.startBtnClick
     @polListStart.forEach ((li) =>
       ael li, 'click', ((e) =>

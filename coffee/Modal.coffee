@@ -33,4 +33,8 @@ class Modal
     do game.makePolitico
     do modal.hide
 
+  switchBtnClick: =>
+    do @hide
+    do @startShow
+
 modal = new Modal()

@@ -54,20 +54,19 @@
       if (!canPlaySound || !game.cacando) {
         return;
       }
-      console.log(game.politico.audio[0], audio[game.politico.audio[0]]);
       audioSource = audioCtx.createBufferSource();
       if (game.mdist < game.mouseRange[0]) {
         audioSource.buffer = audio[game.politico.audio[3]];
-        setTimeout(setCanPlaySound, 200);
+        setTimeout(setCanPlaySound, 300);
       } else if (game.mdist < game.mouseRange[1]) {
         audioSource.buffer = audio[game.politico.audio[2]];
-        setTimeout(setCanPlaySound, 250);
+        setTimeout(setCanPlaySound, 350);
       } else if (game.mdist < game.mouseRange[2]) {
         audioSource.buffer = audio[game.politico.audio[1]];
         setTimeout(setCanPlaySound, 350);
       } else {
         audioSource.buffer = audio[game.politico.audio[0]];
-        setTimeout(setCanPlaySound, 500);
+        setTimeout(setCanPlaySound, 400);
       }
       canPlaySound = false;
       audioSource.connect(audioCtx.destination);
@@ -153,6 +152,7 @@
 
   Modal = (function() {
     function Modal() {
+      this.switchBtnClick = bind(this.switchBtnClick, this);
       this.startBtnClick = bind(this.startBtnClick, this);
       this.triggerAfterAnim = bind(this.triggerAfterAnim, this);
     }
@@ -209,6 +209,11 @@
       return modal.hide();
     };
 
+    Modal.prototype.switchBtnClick = function() {
+      this.hide();
+      return this.startShow();
+    };
+
     return Modal;
 
   })();
@@ -216,7 +221,7 @@
   modal = new Modal();
 
   Game = (function() {
-    var dist, politicos;
+    var dist, politicos, screenWidth;
 
     function Game() {
       this.bodyClick = bind(this.bodyClick, this);
@@ -224,7 +229,11 @@
       this.bodyMouseMove = bind(this.bodyMouseMove, this);
     }
 
-    Game.prototype.mouseRange = [100, 500, 1000, 2000];
+    screenWidth = Math.max(Math.max(document.documentElement.clientWidth, window.innerWidth || 0), Math.max(document.documentElement.clientHeight, window.innerWidth || 0));
+
+    Game.prototype.mouseRange = [0.0528033, 0.26, 0.520833, 0.7].map(function(e) {
+      return e * screenWidth;
+    });
 
     Game.prototype.mdist = Game.prototype.mouseRange[1];
 
@@ -274,7 +283,7 @@
         storage.addPontos();
         setTimeout(modal.triggerAfterAnim, 1000);
         this.cacando = false;
-        return this.mdist = this.mouseRange[0] + 1;
+        return this.mdist = this.mouseRange[1];
       }
     };
 
@@ -283,8 +292,8 @@
       w = dom.getWidth();
       h = dom.getHeight();
       this.politico = politicos[this.politicoIdx];
-      this.politico.x = Math.floor(Math.random() * (w - 100) + 100);
-      this.politico.y = Math.floor(Math.random() * (h - 100) + 100);
+      this.politico.x = Math.floor(Math.random() * (w - 0.05 * w) + 0.025 * w);
+      this.politico.y = Math.floor(Math.random() * (h - 0.05 * h) + 0.025 * h);
       a = document.querySelector('.hint');
       a.style.top = this.politico.y + 'px';
       return a.style.left = this.politico.x + 'px';
@@ -322,7 +331,8 @@
       this.body = document.body;
       this.modal = document.querySelector('.modal');
       this.modalPontos = this.modal.querySelector('.pontos');
-      this.repeatBtn = this.modal.querySelector('.btn');
+      this.repeatBtn = this.modal.querySelector('.repeat');
+      this.switchBtn = this.modal.querySelector('.switch');
       this.polImgModal = this.modal.querySelector('.polImgModal');
       this.startModal = document.querySelector('.start-modal');
       this.polListStart = this.startModal.querySelectorAll('.pol-list li');
@@ -358,6 +368,7 @@
       ael(document, 'touchmove', throttle(game.bodyTouchMove, 80));
       ael(this.body, 'click', game.bodyClick);
       ael(this.repeatBtn, 'click', modal.repeatBtnClick);
+      ael(this.switchBtn, 'click', modal.switchBtnClick);
       ael(this.startBtn, 'click', modal.startBtnClick);
       this.polListStart.forEach(((function(_this) {
         return function(li) {

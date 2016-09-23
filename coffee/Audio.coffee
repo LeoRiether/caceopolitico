@@ -23,20 +23,19 @@ class Audio
     canPlaySound = yes
   playSound: ->
     return if not canPlaySound or not game.cacando
-    console.log game.politico.audio[0], audio[game.politico.audio[0]]
     audioSource = do audioCtx.createBufferSource
     if game.mdist < game.mouseRange[0]
       audioSource.buffer = audio[game.politico.audio[3]]
-      setTimeout setCanPlaySound, 200
+      setTimeout setCanPlaySound, 300
     else if game.mdist < game.mouseRange[1]
       audioSource.buffer = audio[game.politico.audio[2]]
-      setTimeout setCanPlaySound, 250
+      setTimeout setCanPlaySound, 350
     else if game.mdist < game.mouseRange[2]
       audioSource.buffer = audio[game.politico.audio[1]]
       setTimeout setCanPlaySound, 350
     else
       audioSource.buffer = audio[game.politico.audio[0]]
-      setTimeout setCanPlaySound, 500
+      setTimeout setCanPlaySound, 400
     canPlaySound = no
     #audioSource.buffer = audio[game.politico.audioKey];
     audioSource.connect audioCtx.destination
