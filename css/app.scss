@@ -68,4 +68,8 @@ html, body {
     //filter: drop-shadow($x $y $b $c) drop-shadow(-$x -$y $b $c);
     //-webkit-filter: drop-shadow($x $y $b $c) drop-shadow(-$x -$y $b $c);
   }
+
+  .blocked img {
+    filter: brightness(-100%);
+  }
 }

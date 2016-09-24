@@ -1,4 +1,5 @@
 class Modal
+
   triggerAfterAnim: =>
     do @setPontos
     do @show
@@ -14,6 +15,7 @@ class Modal
   startHide: ->
     dom.startModal.classList.add 'hidden'
   startShow: ->
+    do @updatePoliticosStart
     dom.startModal.classList.remove 'hidden'
   startToggle: ->
     dom.startModal.classList.toggle 'hidden'
@@ -36,5 +38,11 @@ class Modal
   switchBtnClick: =>
     do @hide
     do @startShow
+
+  updatePoliticosStart: ->
+    dom.polListStart.forEach (e, i) ->
+      if game.politicos[i].blocked()
+        e.classList.add 'blocked'
+      else e.classList.remove 'blocked'
 
 modal = new Modal()

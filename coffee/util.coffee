@@ -8,7 +8,7 @@ ajax = (url, fn, respType) ->
   do req.send
 
 class Politico
-  constructor: (@name, @unblock, img, @audioKey) ->
+  constructor: (@name, @unblock, img, @audioKey, @blocked) ->
     @img = "img/#{img}.png"
     #@audio = ("audio/#{audioKey}/#{audioKey}00#{i}.wav" for i in [1..4])
     @audio = (for i in [1..4]
@@ -17,7 +17,6 @@ class Politico
       audio.ajaxAudio l, k
       k
     )
-  blocked: yes
 
 class Storage
   constructor: ->

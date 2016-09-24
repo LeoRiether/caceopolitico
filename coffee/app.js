@@ -93,11 +93,12 @@
   };
 
   Politico = (function() {
-    function Politico(name, unblock, img, audioKey) {
+    function Politico(name, unblock, img, audioKey, blocked) {
       var i, k, l;
       this.name = name;
       this.unblock = unblock;
       this.audioKey = audioKey;
+      this.blocked = blocked;
       this.img = "img/" + img + ".png";
       this.audio = (function() {
         var j, results;
@@ -111,8 +112,6 @@
         return results;
       }).call(this);
     }
-
-    Politico.prototype.blocked = true;
 
     return Politico;
 
@@ -150,78 +149,8 @@
 
   storage = new Storage();
 
-  Modal = (function() {
-    function Modal() {
-      this.switchBtnClick = bind(this.switchBtnClick, this);
-      this.startBtnClick = bind(this.startBtnClick, this);
-      this.triggerAfterAnim = bind(this.triggerAfterAnim, this);
-    }
-
-    Modal.prototype.triggerAfterAnim = function() {
-      this.setPontos();
-      this.show();
-      return game.removePoliticoImg();
-    };
-
-    Modal.prototype.hide = function() {
-      return dom.modal.classList.add('hidden');
-    };
-
-    Modal.prototype.show = function() {
-      return dom.modal.classList.remove('hidden');
-    };
-
-    Modal.prototype.toggle = function() {
-      return dom.modal.classList.toggle('hidden');
-    };
-
-    Modal.prototype.startHide = function() {
-      return dom.startModal.classList.add('hidden');
-    };
-
-    Modal.prototype.startShow = function() {
-      return dom.startModal.classList.remove('hidden');
-    };
-
-    Modal.prototype.startToggle = function() {
-      return dom.startModal.classList.toggle('hidden');
-    };
-
-    Modal.prototype.setPontos = function() {
-      return dom.modalPontos.innerHTML = storage.pontos;
-    };
-
-    Modal.prototype.startBtnClick = function() {
-      game.cacando = true;
-      this.startHide();
-      return game.makePolitico();
-    };
-
-    Modal.prototype.repeatBtnClick = function() {
-      if (game.cacando) {
-        return;
-      }
-      setTimeout((function() {
-        return game.cacando = true;
-      }), 800);
-      game.removePoliticoImg();
-      game.makePolitico();
-      return modal.hide();
-    };
-
-    Modal.prototype.switchBtnClick = function() {
-      this.hide();
-      return this.startShow();
-    };
-
-    return Modal;
-
-  })();
-
-  modal = new Modal();
-
   Game = (function() {
-    var dist, politicos, screenWidth;
+    var dist, screenWidth;
 
     function Game() {
       this.bodyClick = bind(this.bodyClick, this);
@@ -243,7 +172,15 @@
 
     Game.prototype.cacando = false;
 
-    politicos = [new Politico('Temer', 0, 'temer', 'Temer'), new Politico('Dilma', 5, 'Dilma', 'Dilma'), new Politico('Cunha', 10, 'Cunha', 'Cunha')];
+    Game.prototype.politicos = [
+      new Politico('Temer', 0, 'temer', 'Temer', (function() {
+        return false;
+      })), new Politico('Dilma', 5, 'Dilma', 'Dilma', (function() {
+        return storage.pontos < 5;
+      })), new Politico('Cunha', 10, 'Cunha', 'Cunha', (function() {
+        return storage.pontos < 15;
+      }))
+    ];
 
     Game.prototype.bodyMouseMove = function(arg) {
       var x, y;
@@ -291,7 +228,7 @@
       var a, h, w;
       w = dom.getWidth();
       h = dom.getHeight();
-      this.politico = politicos[this.politicoIdx];
+      this.politico = this.politicos[this.politicoIdx];
       this.politico.x = Math.floor(Math.random() * (w - 0.05 * w) + 0.025 * w);
       this.politico.y = Math.floor(Math.random() * (h - 0.05 * h) + 0.025 * h);
       a = document.querySelector('.hint');
@@ -323,6 +260,87 @@
   })();
 
   game = new Game();
+
+  Modal = (function() {
+    function Modal() {
+      this.switchBtnClick = bind(this.switchBtnClick, this);
+      this.startBtnClick = bind(this.startBtnClick, this);
+      this.triggerAfterAnim = bind(this.triggerAfterAnim, this);
+    }
+
+    Modal.prototype.triggerAfterAnim = function() {
+      this.setPontos();
+      this.show();
+      return game.removePoliticoImg();
+    };
+
+    Modal.prototype.hide = function() {
+      return dom.modal.classList.add('hidden');
+    };
+
+    Modal.prototype.show = function() {
+      return dom.modal.classList.remove('hidden');
+    };
+
+    Modal.prototype.toggle = function() {
+      return dom.modal.classList.toggle('hidden');
+    };
+
+    Modal.prototype.startHide = function() {
+      return dom.startModal.classList.add('hidden');
+    };
+
+    Modal.prototype.startShow = function() {
+      this.updatePoliticosStart();
+      return dom.startModal.classList.remove('hidden');
+    };
+
+    Modal.prototype.startToggle = function() {
+      return dom.startModal.classList.toggle('hidden');
+    };
+
+    Modal.prototype.setPontos = function() {
+      return dom.modalPontos.innerHTML = storage.pontos;
+    };
+
+    Modal.prototype.startBtnClick = function() {
+      game.cacando = true;
+      this.startHide();
+      return game.makePolitico();
+    };
+
+    Modal.prototype.repeatBtnClick = function() {
+      if (game.cacando) {
+        return;
+      }
+      setTimeout((function() {
+        return game.cacando = true;
+      }), 800);
+      game.removePoliticoImg();
+      game.makePolitico();
+      return modal.hide();
+    };
+
+    Modal.prototype.switchBtnClick = function() {
+      this.hide();
+      return this.startShow();
+    };
+
+    Modal.prototype.updatePoliticosStart = function() {
+      return dom.polListStart.forEach(function(e, i) {
+        if (game.politicos[i].blocked()) {
+          return e.classList.add('blocked');
+        } else {
+          return e.classList.remove('blocked');
+        }
+      });
+    };
+
+    return Modal;
+
+  })();
+
+  modal = new Modal();
 
   Dom = (function() {
     var ael, throttle;
@@ -371,9 +389,12 @@
       ael(this.switchBtn, 'click', modal.switchBtnClick);
       ael(this.startBtn, 'click', modal.startBtnClick);
       this.polListStart.forEach(((function(_this) {
-        return function(li) {
+        return function(li, i) {
           return ael(li, 'click', (function(e) {
-            game.politicoIdx = parseInt(e.target.dataset.pol);
+            if (game.politicos[i].blocked()) {
+              return;
+            }
+            game.politicoIdx = i;
             _this.startModal.querySelector('.active').classList.remove('active');
             return li.classList.add('active');
           }));
@@ -407,5 +428,7 @@
   })();
 
   dom = new Dom();
+
+  modal.updatePoliticosStart();
 
 }).call(this);

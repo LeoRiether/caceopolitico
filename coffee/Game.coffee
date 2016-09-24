@@ -6,10 +6,10 @@ class Game
   politico: {}
   politicoIdx: 0
   cacando: no
-  politicos = [
-    new Politico 'Temer', 0, 'temer', 'Temer'
-    new Politico 'Dilma', 5, 'Dilma', 'Dilma'
-    new Politico 'Cunha', 10, 'Cunha', 'Cunha'
+  politicos: [
+    new Politico 'Temer', 0, 'temer', 'Temer', (-> no)
+    new Politico 'Dilma', 5, 'Dilma', 'Dilma', (-> storage.pontos < 5)
+    new Politico 'Cunha', 10, 'Cunha', 'Cunha', (-> storage.pontos < 15)
   ]
   bodyMouseMove: ({ clientX: x, clientY: y }) =>
     return if not @cacando
@@ -41,7 +41,7 @@ class Game
   makePolitico: ->
     w = do dom.getWidth
     h = do dom.getHeight
-    @politico = politicos[@politicoIdx]
+    @politico = @politicos[@politicoIdx]
     @politico.x = Math.floor Math.random() * (w-0.05*w) + 0.025*w
     @politico.y = Math.floor Math.random() * (h-0.05*h) + 0.025*h
     a = document.querySelector('.hint')

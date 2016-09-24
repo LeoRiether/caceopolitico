@@ -28,7 +28,6 @@
   display: inline-block;
   border: 2px solid $col;
   .btn {
-    width: auto;
     display: inline-block;
     border: none;
     border-right: thin solid $col;
@@ -36,11 +35,14 @@
 
     &:last-child {
       border: none;
-      //padding-right: 0;
     }
+  }
+}
 
-    &:first-child {
-      //padding-left: 0;
-    }
+@media screen and (max-width: 1050px) {
+  .button-group .btn {
+    width: 100%;
+    border:none;
+    border-bottom: thin solid $col;
   }
 }

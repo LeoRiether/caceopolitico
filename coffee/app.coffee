@@ -53,7 +53,7 @@ ajax = (url, fn, respType) ->
   do req.send
 
 class Politico
-  constructor: (@name, @unblock, img, @audioKey) ->
+  constructor: (@name, @unblock, img, @audioKey, @blocked) ->
     @img = "img/#{img}.png"
     #@audio = ("audio/#{audioKey}/#{audioKey}00#{i}.wav" for i in [1..4])
     @audio = (for i in [1..4]
@@ -62,7 +62,6 @@ class Politico
       audio.ajaxAudio l, k
       k
     )
-  blocked: yes
 
 class Storage
   constructor: ->
@@ -78,47 +77,6 @@ class Storage
 
 storage = new Storage()
 
-class Modal
-  triggerAfterAnim: =>
-    do @setPontos
-    do @show
-    do game.removePoliticoImg
-
-  hide: ->
-    dom.modal.classList.add 'hidden'
-  show: ->
-    dom.modal.classList.remove 'hidden'
-  toggle: ->
-    dom.modal.classList.toggle 'hidden'
-
-  startHide: ->
-    dom.startModal.classList.add 'hidden'
-  startShow: ->
-    dom.startModal.classList.remove 'hidden'
-  startToggle: ->
-    dom.startModal.classList.toggle 'hidden'
-
-  setPontos: ->
-    dom.modalPontos.innerHTML = storage.pontos
-
-  startBtnClick: =>
-    game.cacando = yes
-    @startHide()
-    do game.makePolitico
-
-  repeatBtnClick: ->
-    return if game.cacando
-    setTimeout (-> game.cacando = yes), 800
-    do game.removePoliticoImg
-    do game.makePolitico
-    do modal.hide
-
-  switchBtnClick: =>
-    do @hide
-    do @startShow
-
-modal = new Modal()
-
 class Game
   #mouseRange: [ 100, 500, 1000, 2000 ]
   screenWidth = Math.max(Math.max(document.documentElement.clientWidth, window.innerWidth || 0), Math.max(document.documentElement.clientHeight, window.innerWidth || 0))
@@ -127,10 +85,10 @@ class Game
   politico: {}
   politicoIdx: 0
   cacando: no
-  politicos = [
-    new Politico 'Temer', 0, 'temer', 'Temer'
-    new Politico 'Dilma', 5, 'Dilma', 'Dilma'
-    new Politico 'Cunha', 10, 'Cunha', 'Cunha'
+  politicos: [
+    new Politico 'Temer', 0, 'temer', 'Temer', (-> no)
+    new Politico 'Dilma', 5, 'Dilma', 'Dilma', (-> storage.pontos < 5)
+    new Politico 'Cunha', 10, 'Cunha', 'Cunha', (-> storage.pontos < 15)
   ]
   bodyMouseMove: ({ clientX: x, clientY: y }) =>
     return if not @cacando
@@ -162,7 +120,7 @@ class Game
   makePolitico: ->
     w = do dom.getWidth
     h = do dom.getHeight
-    @politico = politicos[@politicoIdx]
+    @politico = @politicos[@politicoIdx]
     @politico.x = Math.floor Math.random() * (w-0.05*w) + 0.025*w
     @politico.y = Math.floor Math.random() * (h-0.05*h) + 0.025*h
     a = document.querySelector('.hint')
@@ -183,6 +141,55 @@ class Game
     do polImg.remove if polImg
 
 game = new Game()
+
+class Modal
+
+  triggerAfterAnim: =>
+    do @setPontos
+    do @show
+    do game.removePoliticoImg
+
+  hide: ->
+    dom.modal.classList.add 'hidden'
+  show: ->
+    dom.modal.classList.remove 'hidden'
+  toggle: ->
+    dom.modal.classList.toggle 'hidden'
+
+  startHide: ->
+    dom.startModal.classList.add 'hidden'
+  startShow: ->
+    do @updatePoliticosStart
+    dom.startModal.classList.remove 'hidden'
+  startToggle: ->
+    dom.startModal.classList.toggle 'hidden'
+
+  setPontos: ->
+    dom.modalPontos.innerHTML = storage.pontos
+
+  startBtnClick: =>
+    game.cacando = yes
+    @startHide()
+    do game.makePolitico
+
+  repeatBtnClick: ->
+    return if game.cacando
+    setTimeout (-> game.cacando = yes), 800
+    do game.removePoliticoImg
+    do game.makePolitico
+    do modal.hide
+
+  switchBtnClick: =>
+    do @hide
+    do @startShow
+
+  updatePoliticosStart: ->
+    dom.polListStart.forEach (e, i) ->
+      if game.politicos[i].blocked()
+        e.classList.add 'blocked'
+      else e.classList.remove 'blocked'
+
+modal = new Modal()
 
 class Dom
   constructor: ->
@@ -219,9 +226,10 @@ class Dom
     ael @repeatBtn, 'click', modal.repeatBtnClick
     ael @switchBtn, 'click', modal.switchBtnClick
     ael @startBtn, 'click', modal.startBtnClick
-    @polListStart.forEach ((li) =>
+    @polListStart.forEach ((li, i) =>
       ael li, 'click', ((e) =>
-        game.politicoIdx = parseInt e.target.dataset.pol
+        return if game.politicos[i].blocked()
+        game.politicoIdx = i
         @startModal.querySelector('.active').classList.remove 'active'
         li.classList.add 'active'
       )
@@ -236,4 +244,5 @@ class Dom
     Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
 
 dom = new Dom()
+modal.updatePoliticosStart()
 

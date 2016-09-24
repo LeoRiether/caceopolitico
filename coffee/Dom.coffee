@@ -33,9 +33,10 @@ class Dom
     ael @repeatBtn, 'click', modal.repeatBtnClick
     ael @switchBtn, 'click', modal.switchBtnClick
     ael @startBtn, 'click', modal.startBtnClick
-    @polListStart.forEach ((li) =>
+    @polListStart.forEach ((li, i) =>
       ael li, 'click', ((e) =>
-        game.politicoIdx = parseInt e.target.dataset.pol
+        return if game.politicos[i].blocked()
+        game.politicoIdx = i
         @startModal.querySelector('.active').classList.remove 'active'
         li.classList.add 'active'
       )
@@ -50,3 +51,4 @@ class Dom
     Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
 
 dom = new Dom()
+modal.updatePoliticosStart()

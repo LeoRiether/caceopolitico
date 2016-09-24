@@ -1,1 +1,1 @@
-coffeescript-concat Dom.coffee Audio.coffee Game.coffee Modal.coffee util.coffee -o app.coffee && coffee -c app.coffee
+coffeescript-concat Dom.coffee Audio.coffee Modal.coffee Game.coffee util.coffee -o app.coffee && coffee -c app.coffee
